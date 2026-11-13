@@ -1,5 +1,21 @@
-export class Vehicle {
-  private _speed: number = 0;
+export enum VehicleStatus {
+  Stopped = "STOPPED",
+  Running = "RUNNING",
+}
+
+export type Coordinates = [
+  latitude: number,
+  longitude: number,
+];
+
+function assertNever(value: never): never {
+  throw new Error(`Unhandled vehicle status: ${value}`);
+}
+
+export abstract class Vehicle {
+  private _speed = 0;
+  private _status: VehicleStatus = VehicleStatus.Stopped;
+  private _location: Coordinates = [0, 0];
 
   constructor(
     public readonly brand: string,
@@ -10,30 +26,88 @@ export class Vehicle {
     return this._speed;
   }
 
-  start(): void {
-    console.log(`${this.brand} ${this.model} is starting`);
+  get status(): VehicleStatus {
+    return this._status;
   }
 
-  accelerate(amount: number): void {
-    if (!Number.isFinite(amount) || amount <= 0) {
+  start(): void {
+    this._status = VehicleStatus.Running;
+    console.log(`${this.brand} ${this.model} started`);
+  }
+
+  stop(): void {
+    this._speed = 0;
+    this._status = VehicleStatus.Stopped;
+  }
+
+  getStatusLabel(): string {
+    const status = this._status;
+
+    switch (status) {
+      case VehicleStatus.Stopped:
+        return "Stopped";
+
+      case VehicleStatus.Running:
+        return "Running";
+
+      default:
+        return assertNever(status);
+    }
+  }
+
+  protected parseAcceleration(amount: number | string): number {
+    const value =
+      typeof amount === "string"
+        ? Number(amount.trim())
+        : amount;
+
+    if (!Number.isFinite(value) || value <= 0) {
       throw new RangeError(
         "Acceleration must be a positive finite number.",
       );
     }
 
-    const newSpeed = this._speed + amount;
+    return value;
+  }
+
+  accelerate(amount: number | string): void {
+    const value = this.parseAcceleration(amount);
+
+    if (this._status !== VehicleStatus.Running) {
+      throw new Error("Start the vehicle before accelerating.");
+    }
+
+    const newSpeed = this._speed + value;
 
     if (!Number.isFinite(newSpeed)) {
       throw new RangeError("Resulting speed is too large.");
     }
 
     this._speed = newSpeed;
-    console.log(`Current speed: ${this.speed} km/h`);
+  }
+
+  setLocation(latitude: number, longitude: number): void {
+    if (
+      !Number.isFinite(latitude) ||
+      !Number.isFinite(longitude) ||
+      latitude < -90 ||
+      latitude > 90 ||
+      longitude < -180 ||
+      longitude > 180
+    ) {
+      throw new RangeError("Invalid coordinates.");
+    }
+
+    this._location = [latitude, longitude];
+  }
+
+  getLocation(): Coordinates {
+    return [...this._location];
   }
 
   displayInfo(): void {
-    console.log(`Brand: ${this.brand}`);
-    console.log(`Model: ${this.model}`);
+    console.log(`${this.brand} ${this.model}`);
+    console.log(`Status: ${this.getStatusLabel()}`);
     console.log(`Speed: ${this.speed} km/h`);
   }
 }
@@ -58,28 +132,24 @@ export class Car extends Vehicle {
 }
 
 export class ElectricCar extends Car {
-  private _batteryLevel: number = 100;
-
-  private static readonly accelerationCost: number = 2;
+  private _batteryLevel = 100;
+  private static readonly accelerationCost = 2;
 
   get batteryLevel(): number {
     return this._batteryLevel;
   }
 
-  override accelerate(amount: number): void {
+  override accelerate(amount: number | string): void {
     if (this._batteryLevel < ElectricCar.accelerationCost) {
-      throw new Error("Battery is empty. Charge the car first.");
+      throw new Error("Battery is empty. Charge the car first");
     }
 
     super.accelerate(amount);
-
     this._batteryLevel -= ElectricCar.accelerationCost;
-    console.log(`Battery: ${this.batteryLevel}%`);
   }
 
   charge(): void {
     this._batteryLevel = 100;
-    console.log("Battery fully charged!");
   }
 
   override displayInfo(): void {
@@ -88,53 +158,28 @@ export class ElectricCar extends Car {
   }
 }
 
-// const car1 = new Car("Toyota", "Corolla", 4);
-// const electricCar1 = new ElectricCar("Tesla", "Model 3", 4);
 
-// car1.start();
-// car1.accelerate(50);
-// car1.displayInfo();
+const car = new ElectricCar("Tesla", "Model 3", 4);
 
-// electricCar1.start();
-// electricCar1.accelerate(80);
-// electricCar1.displayInfo(); 
+car.start();
+car.accelerate("20");
+car.accelerate(10);
+car.setLocation(33.5, 36.3);
 
-// electricCar1.charge();
-// electricCar1.displayInfo(); 
+const [latitude, longitude] = car.getLocation();
 
-const testCar = new ElectricCar("Tesla", "Model 3", 4);
+car.displayInfo();
 
+console.log({ latitude, longitude });
 
-try {
-  testCar.accelerate(-300);
-} catch (error: unknown) {
-  console.log(
-    error instanceof Error ? error.message : "Unexpected error",
-  );
-}
-
-console.log(testCar.speed);        
-console.log(testCar.batteryLevel); 
-
-for (let i = 0; i < 50; i++) {
-  testCar.accelerate(1);
-}
-
-console.log(testCar.speed);        
-console.log(testCar.batteryLevel); 
+car.stop();
+console.log(car.speed); 
 
 try {
-  testCar.accelerate(1);
+  car.accelerate(10);
 } catch (error: unknown) {
-  console.log(
-    error instanceof Error ? error.message : "Unexpected error",
-  );
+  if (error instanceof Error) {
+    console.log(error.message);
+    
+  }
 }
-
-console.log(testCar.speed); 
-
-testCar.charge();
-testCar.accelerate(1);
-
-console.log(testCar.speed);        
-console.log(testCar.batteryLevel); 
