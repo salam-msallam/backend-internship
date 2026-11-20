@@ -1,3 +1,4 @@
+import { Transform } from 'class-transformer';
 import {
   IsString,
   IsNotEmpty,
@@ -5,9 +6,14 @@ import {
   MaxLength,
   IsOptional,
   IsBoolean,
+  ValidateIf,
 } from 'class-validator';
 
 export class CreateTaskDto {
+@Transform(({ value }) =>
+    typeof value === 'string' ? value.trim() : value,
+  )
+
   @IsString()
   @IsNotEmpty()
   @MinLength(3)
@@ -18,7 +24,7 @@ export class CreateTaskDto {
   @IsString()
   description?: string;
 
-  @IsOptional()
+  @ValidateIf((_, value) => value !== undefined)
   @IsBoolean()
   completed?: boolean;
 }

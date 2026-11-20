@@ -1,9 +1,10 @@
-import { Controller, Get, Param, ParseIntPipe } from '@nestjs/common';
+import { Controller, Get, Param } from '@nestjs/common';
 import { TasksService } from './tasks.service.js';
 import { Body, Post } from '@nestjs/common';
 import { CreateTaskDto } from './dto/create-task.dto.js';
 import { Patch, Delete } from '@nestjs/common';
 import { UpdateTaskDto } from './dto/update-task.dto.js';
+import { PositiveIntIdPipe } from '../common/pipes/positive-int-id/positive-int-id.pipe.js';
 
 @Controller('tasks')
 export class TasksController {
@@ -21,21 +22,21 @@ export class TasksController {
     }
 
     @Get(':id')
-    findOne(@Param('id' ,  ParseIntPipe) id: number)
+    findOne(@Param('id' ,  PositiveIntIdPipe) id: number)
     {
         return this.tasksService.findOne(id);
     }
 
     @Patch(':id')
     update(
-     @Param('id', ParseIntPipe) id: number,
+     @Param('id', PositiveIntIdPipe) id: number,
      @Body() updateTaskDto: UpdateTaskDto,
 )    {
        return this.tasksService.update(id, updateTaskDto);
 }
 
 @Delete(':id')
-remove(@Param('id', ParseIntPipe) id: number) {
+remove(@Param('id', PositiveIntIdPipe) id: number) {
   return this.tasksService.remove(id);
 }
 

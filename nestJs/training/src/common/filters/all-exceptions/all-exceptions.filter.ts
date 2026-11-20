@@ -52,7 +52,17 @@ message =
     ? responseMessage
     : exception.message;
       }
-    } else if (
+    }
+    
+else if (
+  exception instanceof Prisma.PrismaClientValidationError
+) {
+  status = HttpStatus.BAD_REQUEST;
+  message = 'Invalid data provided';
+
+  this.logger.warn('Prisma validation failed');
+}
+ else if (
       exception instanceof Prisma.PrismaClientKnownRequestError
     ) {
       switch (exception.code) {

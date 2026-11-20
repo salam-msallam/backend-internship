@@ -5,3 +5,13 @@
 **/dist/
 **/generated/prisma/
 nestJs/training-git-backup/
+**/node_modules/
+**/dist/
+**/.env
+**/.env.*
+!**/.env.example
+**/.agents/
+**/.claude/
+**/.windsurf/
+**/skills-lock.json
+nestJs/training-git-backup/
