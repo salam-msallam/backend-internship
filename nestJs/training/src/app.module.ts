@@ -23,12 +23,12 @@ export const { ObserveModule, ObserveInstrument } = createObserveModule();
     PrismaModule,
   ],
   controllers: [AppController],
-  providers: [AppService, 
+  providers: [
+    AppService,
     {
       provide: APP_FILTER,
       useClass: AllExceptionsFilter,
     },
-
   ],
 })
 export class AppModule {}

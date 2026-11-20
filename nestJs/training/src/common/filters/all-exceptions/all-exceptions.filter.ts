@@ -1,4 +1,3 @@
-
 import {
   ArgumentsHost,
   Catch,
@@ -12,12 +11,8 @@ import type { Request, Response } from 'express';
 import { Prisma } from '../../../generated/prisma/client.js';
 
 @Catch()
-export class AllExceptionsFilter
-  implements ExceptionFilter
-{
-  private readonly logger = new Logger(
-    AllExceptionsFilter.name,
-  );
+export class AllExceptionsFilter implements ExceptionFilter {
+  private readonly logger = new Logger(AllExceptionsFilter.name);
 
   catch(exception: unknown, host: ArgumentsHost): void {
     const ctx = host.switchToHttp();
@@ -26,8 +21,7 @@ export class AllExceptionsFilter
     const request = ctx.getRequest<Request>();
 
     let status = HttpStatus.INTERNAL_SERVER_ERROR;
-    let message: string | string[] =
-      'Internal server error';
+    let message: string | string[] = 'Internal server error';
 
     if (exception instanceof HttpException) {
       status = exception.getStatus();
@@ -38,33 +32,23 @@ export class AllExceptionsFilter
         message = errorResponse;
       } else {
         const responseMessage =
-  'message' in errorResponse
-    ? errorResponse.message
-    : undefined;
+          'message' in errorResponse ? errorResponse.message : undefined;
 
-message =
-  typeof responseMessage === 'string' ||
-  (Array.isArray(responseMessage) &&
-    responseMessage.every(
-      (item): item is string =>
-        typeof item === 'string',
-    ))
-    ? responseMessage
-    : exception.message;
+        message =
+          typeof responseMessage === 'string' ||
+          (Array.isArray(responseMessage) &&
+            responseMessage.every(
+              (item): item is string => typeof item === 'string',
+            ))
+            ? responseMessage
+            : exception.message;
       }
-    }
-    
-else if (
-  exception instanceof Prisma.PrismaClientValidationError
-) {
-  status = HttpStatus.BAD_REQUEST;
-  message = 'Invalid data provided';
+    } else if (exception instanceof Prisma.PrismaClientValidationError) {
+      status = HttpStatus.BAD_REQUEST;
+      message = 'Invalid data provided';
 
-  this.logger.warn('Prisma validation failed');
-}
- else if (
-      exception instanceof Prisma.PrismaClientKnownRequestError
-    ) {
+      this.logger.warn('Prisma validation failed');
+    } else if (exception instanceof Prisma.PrismaClientKnownRequestError) {
       switch (exception.code) {
         case 'P2025':
           status = HttpStatus.NOT_FOUND;

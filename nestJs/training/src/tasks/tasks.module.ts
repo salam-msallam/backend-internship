@@ -4,19 +4,13 @@ import { TasksService } from './tasks.service.js';
 import { PrismaModule } from '../prisma/prisma.module.js';
 import { LoggerMiddleware } from '../common/middleware/logger/logger.middleware.js';
 
-
 @Module({
-   imports: [PrismaModule],
+  imports: [PrismaModule],
   controllers: [TasksController],
-  providers: [TasksService]
+  providers: [TasksService],
 })
-
 export class TasksModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer
-      .apply(LoggerMiddleware)
-      .forRoutes(TasksController);
+    consumer.apply(LoggerMiddleware).forRoutes(TasksController);
   }
 }
-
-

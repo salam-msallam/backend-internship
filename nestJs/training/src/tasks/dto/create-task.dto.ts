@@ -10,10 +10,7 @@ import {
 } from 'class-validator';
 
 export class CreateTaskDto {
-@Transform(({ value }) =>
-    typeof value === 'string' ? value.trim() : value,
-  )
-
+  @Transform(({ value }) => (typeof value === 'string' ? value.trim() : value))
   @IsString()
   @IsNotEmpty()
   @MinLength(3)

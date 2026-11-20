@@ -7,7 +7,7 @@ async function bootstrap() {
     instrument: ObserveInstrument,
   });
 
-   app.useGlobalPipes(
+  app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
       forbidNonWhitelisted: true,
