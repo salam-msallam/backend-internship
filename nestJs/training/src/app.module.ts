@@ -6,14 +6,14 @@ import { TasksModule } from './tasks/tasks.module.js';
 import { PrismaModule } from './prisma/prisma.module.js';
 import { AllExceptionsFilter } from './common/filters/all-exceptions/all-exceptions.filter.js';
 import { APP_FILTER } from '@nestjs/core';
+import { AuthModule } from './auth/auth.module.js';
+import { APP_INTERCEPTOR } from '@nestjs/core';
+import { LoggingInterceptor } from './common/interceptors/logging.interceptor.js';
 
 export const { ObserveModule, ObserveInstrument } = createObserveModule();
 
 @Module({
-  imports: [
-    // Distributed tracing, auto-correlated logs, request/job metrics, error
-    // telemetry, alarms, and more — out of the box. Sign up at https://observe.nestjs.com,
-    // then run `npx @nestjs/observe link` to write your key pair into .env.
+  imports: [  
     ObserveModule.forRoot({
       appKey: process.env.OBSERVE_APP_KEY ?? 'YOUR_APP_KEY',
       appSecret: process.env.OBSERVE_APP_SECRET ?? 'YOUR_APP_SECRET',
@@ -21,6 +21,7 @@ export const { ObserveModule, ObserveInstrument } = createObserveModule();
     }),
     TasksModule,
     PrismaModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [
@@ -29,6 +30,10 @@ export const { ObserveModule, ObserveInstrument } = createObserveModule();
       provide: APP_FILTER,
       useClass: AllExceptionsFilter,
     },
+    {
+  provide: APP_INTERCEPTOR,
+  useClass: LoggingInterceptor,
+},
   ],
 })
 export class AppModule {}

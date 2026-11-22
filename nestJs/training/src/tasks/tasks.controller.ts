@@ -5,11 +5,14 @@ import { CreateTaskDto } from './dto/create-task.dto.js';
 import { Patch, Delete } from '@nestjs/common';
 import { UpdateTaskDto } from './dto/update-task.dto.js';
 import { PositiveIntIdPipe } from '../common/pipes/positive-int-id/positive-int-id.pipe.js';
+import { UseGuards } from '@nestjs/common';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard.js';
 
 @Controller('tasks')
 export class TasksController {
   constructor(private readonly tasksService: TasksService) {}
 
+  @UseGuards(JwtAuthGuard)
   @Post()
   create(@Body() createTaskDto: CreateTaskDto) {
     return this.tasksService.create(createTaskDto);
@@ -25,6 +28,8 @@ export class TasksController {
     return this.tasksService.findOne(id);
   }
 
+
+  @UseGuards(JwtAuthGuard)
   @Patch(':id')
   update(
     @Param('id', PositiveIntIdPipe) id: number,
@@ -33,6 +38,7 @@ export class TasksController {
     return this.tasksService.update(id, updateTaskDto);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Delete(':id')
   remove(@Param('id', PositiveIntIdPipe) id: number) {
     return this.tasksService.remove(id);
