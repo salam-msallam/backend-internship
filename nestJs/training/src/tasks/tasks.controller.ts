@@ -24,23 +24,22 @@ export class TasksController {
   }
 
   @Get(':id')
-  findOne(@Param('id', PositiveIntIdPipe) id: number) {
-    return this.tasksService.findOne(id);
+  findOne(@Param('id', PositiveIntIdPipe) id: string) {
+    return this.tasksService.findOne(Number(id));
   }
-
 
   @UseGuards(JwtAuthGuard)
   @Patch(':id')
   update(
-    @Param('id', PositiveIntIdPipe) id: number,
+    @Param('id', PositiveIntIdPipe) id: string,
     @Body() updateTaskDto: UpdateTaskDto,
   ) {
-    return this.tasksService.update(id, updateTaskDto);
+    return this.tasksService.update(Number(id), updateTaskDto);
   }
 
   @UseGuards(JwtAuthGuard)
   @Delete(':id')
-  remove(@Param('id', PositiveIntIdPipe) id: number) {
-    return this.tasksService.remove(id);
+  remove(@Param('id', PositiveIntIdPipe) id: string) {
+    return this.tasksService.remove(Number(id));
   }
 }

@@ -5,8 +5,8 @@ import type { PipeTransform } from '@nestjs/common';
 const MAX_INT = 2_147_483_647;
 
 @Injectable()
-export class PositiveIntIdPipe implements PipeTransform<string, number> {
-  transform(value: string): number {
+export class PositiveIntIdPipe implements PipeTransform<string, string> {
+  transform(value: string): string {
     if (!/^[1-9]\d*$/.test(value)) {
       throw new BadRequestException('ID must be a positive integer');
     }
@@ -17,6 +17,6 @@ export class PositiveIntIdPipe implements PipeTransform<string, number> {
       throw new BadRequestException(`ID must not exceed ${MAX_INT}`);
     }
 
-    return id;
+    return value;
   }
 }

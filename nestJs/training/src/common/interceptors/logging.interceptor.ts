@@ -6,7 +6,6 @@ import type {
   NestInterceptor,
 } from '@nestjs/common';
 
-import { finalize } from 'rxjs';
 import type { Observable } from 'rxjs';
 import type { Request, Response } from 'express';
 
@@ -20,14 +19,14 @@ export class LoggingInterceptor implements NestInterceptor {
 
     const start = Date.now();
 
-    return next.handle().pipe(
-      finalize(() => {
-        const duration = Date.now() - start;
+    response.once('finish', () => {
+      const duration = Date.now() - start;
 
-        this.logger.log(
-          `${request.method} ${request.path} ${response.statusCode} - ${duration}ms`,
-        );
-      }),
-    );
+      this.logger.log(
+        `${request.method} ${request.path} ${response.statusCode} - ${duration}ms`,
+      );
+    });
+
+    return next.handle();
   }
 }

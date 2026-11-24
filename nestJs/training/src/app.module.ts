@@ -13,7 +13,7 @@ import { LoggingInterceptor } from './common/interceptors/logging.interceptor.js
 export const { ObserveModule, ObserveInstrument } = createObserveModule();
 
 @Module({
-  imports: [  
+  imports: [
     ObserveModule.forRoot({
       appKey: process.env.OBSERVE_APP_KEY ?? 'YOUR_APP_KEY',
       appSecret: process.env.OBSERVE_APP_SECRET ?? 'YOUR_APP_SECRET',
@@ -31,9 +31,9 @@ export const { ObserveModule, ObserveInstrument } = createObserveModule();
       useClass: AllExceptionsFilter,
     },
     {
-  provide: APP_INTERCEPTOR,
-  useClass: LoggingInterceptor,
-},
+      provide: APP_INTERCEPTOR,
+      useClass: LoggingInterceptor,
+    },
   ],
 })
 export class AppModule {}

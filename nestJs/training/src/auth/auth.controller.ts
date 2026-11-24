@@ -10,15 +10,13 @@ import {
 
 import { AuthService } from './auth.service.js';
 import { LoginDto } from './dto/login.dto.js';
-import type { AuthUser } from './auth-user.interface.js'
+import type { AuthUser } from './auth-user.interface.js';
 import { CurrentUser } from '../common/decorators/current-user.decorator.js';
 import { JwtAuthGuard } from './jwt-auth.guard.js';
 
 @Controller('auth')
 export class AuthController {
-  constructor(
-    private readonly authService: AuthService,
-  ) {}
+  constructor(private readonly authService: AuthService) {}
 
   @Post('login')
   @HttpCode(HttpStatus.OK)
@@ -27,13 +25,11 @@ export class AuthController {
   }
 
   @UseGuards(JwtAuthGuard)
-@Get('me')
-getProfile(@CurrentUser() user: AuthUser) {
-  return {
-    id: user.sub,
-    username: user.username,
-  };
-}
-
-  
+  @Get('me')
+  getProfile(@CurrentUser() user: AuthUser) {
+    return {
+      id: user.sub,
+      username: user.username,
+    };
+  }
 }

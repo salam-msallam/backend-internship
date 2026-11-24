@@ -1,7 +1,4 @@
-import {
-  Injectable,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 
 import { LoginDto } from './dto/login.dto.js';
@@ -9,18 +6,14 @@ import type { AuthUser } from './auth-user.interface.js';
 
 @Injectable()
 export class AuthService {
-  constructor(
-    private readonly jwtService: JwtService,
-  ) {}
+  constructor(private readonly jwtService: JwtService) {}
 
   async login(dto: LoginDto) {
     if (
       dto.username !== process.env.TRAINING_USERNAME ||
       dto.password !== process.env.TRAINING_PASSWORD
     ) {
-      throw new UnauthorizedException(
-        'Invalid credentials',
-      );
+      throw new UnauthorizedException('Invalid credentials');
     }
 
     const payload: AuthUser = {
